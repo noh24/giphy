@@ -17,22 +17,22 @@ function getGiphy(userSearchQuery) {
   request.send();
 }
 //trendy gif
-// function trendyGiphy() {
-//   let request = new XMLHttpRequest();
-//   const url = `https://api.giphy.com/v1/gifs/trending?api_key=${process.env.API_KEY}&limit=25&rating=r`;
+function trendyGiphy() {
+  let request = new XMLHttpRequest();
+  const url = `https://api.giphy.com/v1/gifs/trending?api_key=${process.env.API_KEY}&limit=25&rating=r`;
 
-//   request.addEventListener('loadend', function() {
-//     let response = JSON.parse(this.responseText);
-//     if (this.status === 200) {
-//       printElement(response);
-//     } else {
-//       printError(this, response);
-//     }
-//   });
+  request.addEventListener('loadend', function() {
+    let response = JSON.parse(this.responseText);
+    if (this.status === 200) {
+      printElement(response);
+    } else {
+      printError(this, response);
+    }
+  });
 
-//   request.open("GET", url, true);
-//   request.send();
-// }
+  request.open("GET", url, true);
+  request.send();
+}
 // ui logic
 function printError(request, apiResponse, search) {
   document.getElementById('response').innerHTML = null;
@@ -56,7 +56,7 @@ function printElement(apiResponse) {
 // }
 
 window.addEventListener('load', function() {
-  // document.getElementById('trendy').addEventListener('click', trendyGiphy);
+  document.getElementById('trendy').addEventListener('click', trendyGiphy);
   document.getElementById('form').addEventListener('submit', function(e) {
     e.preventDefault();
     let search = document.getElementById('gif-input').value;
