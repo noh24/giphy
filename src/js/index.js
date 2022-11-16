@@ -1,4 +1,4 @@
-import GiphyService from "./giphy-service";
+import { GiphyService, TrendyGiphyService } from "./giphy-service";
 //search GIPHY api function
 function getGiphy(userSearchQuery) { 
   let promise = GiphyService.getGiphy(userSearchQuery);
@@ -10,23 +10,16 @@ function getGiphy(userSearchQuery) {
   });
 }
 // trendy gif
+
 function trendyGiphy() {
-  let request = new XMLHttpRequest();
-  const url = `https://api.giphy.com/v1/gifs/trending?api_key=${process.env.API_KEY}&limit=25&rating=r`;
-
-  request.addEventListener('loadend', function() {
-    let response = JSON.parse(this.responseText);
-    if (this.status === 200) {
-      printElement(response);
-    } else {
-      printError(this, response);
-    }
+  let promise = TrendyGiphyService.trendyGiphy();
+  
+  promise.then(function(trendyGiphyData) {
+    printElement(trendyGiphyData);
+  }, function(trendyGiphyErrorArray) {
+    printError(trendyGiphyErrorArray);
   });
-
-  request.open("GET", url, true);
-  request.send();
 }
-
 // // random gif
 // function randomGiphy() {
 //   let request = new XMLHttpRequest();
@@ -67,7 +60,12 @@ function printElement(data) {
 
 function printError(error) {
   document.getElementById('response').innerHTML = null;
-  document.getElementById('response').innerHTML = `${error[2]} is not a valid search. ${error[0].status} ${error[0].statusText}: ${error[1].meta.msg}`;
+  if (error[2] !== undefined) {
+    document.getElementById('response').innerHTML = `${error[2]} is not a valid search. ${error[0].status} ${error[0].statusText}: ${error[1].meta.msg}`;
+  } else {
+    document.getElementById('response').innerHTML = `${error[0].status} ${error[0].statusText}: ${error[1].meta.msg}`;
+
+  }
 }
   
 window.addEventListener('load', function() {
