@@ -1,22 +1,15 @@
-// business logic
+import GiphyService from "./giphy-service";
 //search GIPHY api function
 function getGiphy(userSearchQuery) { 
-  let request = new XMLHttpRequest();
-  const url = `https://api.giphy.com/v1/gifs/search?api_key=${process.env.API_KEY}&q=${userSearchQuery}&limit=25&offset=0&rating=g&lang=en`;
-  
-  request.addEventListener('loadend', function() {
-    let response = JSON.parse(this.responseText);
-    if (this.status === 200) {
-      printElement(response);
-    } else {
-      printError(this, response, userSearchQuery);
-    }
+  let promise = GiphyService.getGiphy(userSearchQuery);
+
+  promise.then(function(giphyData) {
+    printElement(giphyData);
+  }, function(giphyErrorArray) {
+    printError(giphyErrorArray);
   });
-  
-  request.open("GET", url, true);
-  request.send();
 }
-//trendy gif
+// trendy gif
 function trendyGiphy() {
   let request = new XMLHttpRequest();
   const url = `https://api.giphy.com/v1/gifs/trending?api_key=${process.env.API_KEY}&limit=25&rating=r`;
@@ -34,36 +27,32 @@ function trendyGiphy() {
   request.send();
 }
 
-// random gif
-function randomGiphy() {
-  let request = new XMLHttpRequest();
-  const url = `https://api.giphy.com/v1/gifs/random?api_key=${process.env.API_KEY}&tag=&rating=pg`;
+// // random gif
+// function randomGiphy() {
+//   let request = new XMLHttpRequest();
+//   const url = `https://api.giphy.com/v1/gifs/random?api_key=${process.env.API_KEY}&tag=&rating=pg`;
 
-  request.addEventListener('loadend', function() {
-    let response = JSON.parse(this.responseText);
-    if (this.status === 200) {
-      printElement(response);
-    } else {
-      printError(this, response);
-    }
-  });
+//   request.addEventListener('loadend', function() {
+//     let response = JSON.parse(this.responseText);
+//     if (this.status === 200) {
+//       printElement(response);
+//     } else {
+//       printError(this, response);
+//     }
+//   });
 
-  request.open("GET", url, true); 
-  request.send();
-}
+//   request.open("GET", url, true); 
+//   request.send();
+// }
 
 // ui logic
-function printError(request, apiResponse, search) {
-  document.getElementById('response').innerHTML = null;
-  document.getElementById('response').innerHTML = `${search} is not a valid search. ${request.status} ${request.statusText}: ${apiResponse.meta.msg}`;
-}
 
-function printElement(apiResponse) {
+function printElement(data) {
   document.getElementById('response').innerHTML = null; 
   document.getElementById('gif-input').value = null;
-
-  if (apiResponse.data[1] !== undefined) {
-    apiResponse.data.forEach(gif => {
+  
+  if (data.data[1] !== undefined) {
+    data.data.forEach(gif => {
       const img = document.createElement('img');
       img.setAttribute('src', gif.images.original.url);
       img.setAttribute('width', '250px');
@@ -71,15 +60,19 @@ function printElement(apiResponse) {
     });
   } else {
     const img = document.createElement('img');
-    img.setAttribute('src', apiResponse.data.images.original.url);
+    img.setAttribute('src', data.data.images.original.url);
     document.getElementById('response').append(img);
   }
 }
 
+function printError(error) {
+  document.getElementById('response').innerHTML = null;
+  document.getElementById('response').innerHTML = `${error[2]} is not a valid search. ${error[0].status} ${error[0].statusText}: ${error[1].meta.msg}`;
+}
   
 window.addEventListener('load', function() {
   document.getElementById('trendy').addEventListener('click', trendyGiphy);
-  document.getElementById('random').addEventListener('click', randomGiphy);
+  // document.getElementById('random').addEventListener('click', randomGiphy);
   document.getElementById('form').addEventListener('submit', function(e) {
     e.preventDefault();
     let search = document.getElementById('gif-input').value;
